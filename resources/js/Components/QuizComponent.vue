@@ -1,31 +1,27 @@
 <script lang="ts" setup>
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
-import MainInput from '@/Components/MainInput.vue';
-import MainButton from '@/Components/MainButton.vue';
-import { ref } from 'vue';
 import { useForm } from '@inertiajs/vue3';
+import { ref, Ref } from 'vue';
 import { faCheck } from '@fortawesome/free-solid-svg-icons';
-import WrongAnswerModal from '../WrongAnswerModal.vue';
 
-const props=defineProps<{
-    quiz_vocabularies:quiz_inteface
-}>()
-
-interface quiz_inteface{
-    data : Array<{
-        nl:string;
-        en:string;
-        answer:string;
-    }>
+enum ComponentType{
+    Examen,
+    Vocabulary
 }
 
-const addedAnswers = ref(props.quiz_vocabularies.data)
-const answers=ref('')
-const index=ref(0)
-const buttonLabel=ref('Next')
-const isFinished=ref(false)
+const props=defineProps<{
+    type:ComponentType,
+    quizType:string,
+    examData:array
+}>()
+
+const addedAnswers = ref(props.examData.data)
+const answers : Ref<string>=ref('')
+const index : Ref<number>=ref(0)
+const buttonLabel : Ref<string>=ref('Next')
+const isFinished : Ref<boolean>=ref(false)
 const url = new URL(window.location)
-const openWrongAnswer = ref(false)
+const openWrongAnswer : Ref<boolean> = ref(false)
+
 
 const form=useForm({
     quiz_answers:[],
@@ -33,8 +29,9 @@ const form=useForm({
     vocabulary_number:url.searchParams.get('vocabulary_number'),
     quiz_date:url.searchParams.get('quiz_date'),
     isDone:false,
-    type:'Vocabulary'
+    type:props.type
 })
+
 
 const submit=((isDoneParam : boolean)=>{
 
@@ -44,12 +41,12 @@ const submit=((isDoneParam : boolean)=>{
             preserveState:true,
             onSuccess: () => {
             isFinished.value = true;
-         }
+        }
         })
 })
 
 const indexing=(()=>{
-    let quiz_length=props.quiz_vocabularies.data.length-1;
+    let quiz_length=props.examData.data.length-1;
 
     if(quiz_length-1==index.value) buttonLabel.value='Done'
 
@@ -69,19 +66,14 @@ const indexing=(()=>{
 })
 
 const retry=(()=>{
-    addedAnswers.value=props.quiz_vocabularies.data
+    addedAnswers.value=props.examData.data
     index.value=0
     isFinished.value=false
     buttonLabel.value='Next'
 })
 </script>
 <template>
-    <AuthenticatedLayout>
-        <template #header>
-            <h2 class="font-semibold text-xl text-gray-800 leading-tight">Quiz</h2>
-        </template>
-
-        <div class="py-12">
+    <div class="py-12">
             <div v-if="!isFinished" class="max-w-3xl mx-auto sm:px-6 lg:px-8">
                 <div class="bg-gray-800 overflow-hidden sm:rounded-lg text-white py-7">
                     <h1 class="text-center font-semibold text-2xl">Practice Your Inserted vocabularies</h1>
@@ -137,5 +129,4 @@ const retry=(()=>{
                 <WrongAnswerModal :show="openWrongAnswer" :key="openWrongAnswer.toString()" @close="openWrongAnswer=false" />
             </div>
         </div>
-    </AuthenticatedLayout>
 </template>

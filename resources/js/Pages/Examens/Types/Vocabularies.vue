@@ -16,8 +16,6 @@ const index =ref(0)
 const subIndex =ref(0)
 const currentVocabularies = ref(props.dividedVocabularies.data)
 const answer =ref('')
-const answers=ref([])
-const url = new URLSearchParams(window.location.search)
 
 const calculateScore=(()=>{
     let totalScore=0;
