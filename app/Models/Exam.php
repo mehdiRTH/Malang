@@ -11,6 +11,11 @@ class Exam extends Model
     use HasFactory;
 
     protected $guarded;
+
+    protected $casts=[
+        'wrong_answers'=>'array'
+    ];
+
     public function user() : BelongsTo
     {
         return $this->belongsTo(User::class);

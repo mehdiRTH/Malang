@@ -43,7 +43,6 @@ class ExamenController extends Controller
 
         $perChunk = ceil(count($vocb) / 4);
 
-
         return Inertia::render($this->prefix.'Types/Vocabularies',[
             'dividedVocabularies'=>new ExamenQuizResource(array_chunk($vocb,$perChunk)),
             'exam'=>$exam

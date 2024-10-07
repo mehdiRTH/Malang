@@ -4,7 +4,7 @@ import { ref } from 'vue';
 import MainButton from '@/Components/MainButton.vue';
 import MainInput from '@/Components/MainInput.vue';
 import { useForm, usePage } from '@inertiajs/vue3';
-import { faCheck } from '@fortawesome/free-solid-svg-icons';
+import { faCheck, faRandom } from '@fortawesome/free-solid-svg-icons';
 import WrongAnswersModal from '../WrongAnswersModal.vue';
 
 const props=defineProps<{
@@ -28,7 +28,7 @@ const form=useForm({
     quiz_answer:[],
     exam:props.exam.id,
     isDone:false,
-    globalScore:calculateScore()
+    globalScore:0
 })
 
 const isFinished =ref(false)
@@ -57,7 +57,7 @@ const indexing=(()=>{
 const submit=((isDoneParam : boolean)=>{
 
 form.isDone= isDoneParam ? true : false
-
+form.globalScore=calculateScore()
 form.post(route('examen.check_answers'),{
         preserveState:true,
         onSuccess:(()=>{
