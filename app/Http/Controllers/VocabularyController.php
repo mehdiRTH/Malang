@@ -45,7 +45,7 @@ class VocabularyController extends Controller
     {
         $this->vocabularyRepository->store($request);
 
-        return back();
+        return redirect()->route('vocabularies.index');
     }
 
     /**
@@ -73,7 +73,7 @@ class VocabularyController extends Controller
     {
         $this->vocabularyRepository->update($request,$vocabulary);
 
-        return back();
+        return redirect()->route('vocabularies.index');
     }
 
     /**

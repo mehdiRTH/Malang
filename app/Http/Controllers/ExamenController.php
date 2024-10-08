@@ -30,12 +30,16 @@ class ExamenController extends Controller
         $exam=$this->user->exam()
                     ->whereDate('start_date','>=',$start_date)
                     ->whereDate('end_date','<=',$end_date)
-                    ->firstOrCreate([
-                        'start_date'=>$start_date,
-                        'end_date'=>$end_date,
-                        'score'=>0
-                    ]);
+                    ->first();
 
+        if(!$exam)
+        {
+            $exam=$this->user->exam()->create([
+                'end_date'=>$start_date,
+                'start_date'=>$end_date,
+                'score'=>0
+            ]);
+        }
 
         $vocb= $this->user->vocabularies()
                           ->whereDate('date','>=',$start_date)
@@ -52,7 +56,7 @@ class ExamenController extends Controller
 
     public function check_answers(Request $request)
     {
-        $this->examenRepository->check_answers($request);
+       return $this->examenRepository->check_answers($request);
 
     }
 }
