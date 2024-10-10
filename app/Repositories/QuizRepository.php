@@ -99,30 +99,40 @@ class QuizRepository{
 
     public function checkVocabularies(Request $request): RedirectResponse
     {
-        $count_quiz_answers=count($request->quiz_answers);
-        $checked_answers=$count_quiz_answers;
+        $analyzedAnswers=$this->analyzeVocabularies($request->quiz_answers,$request->answers_lang);
+
+        return $this->createQuiz($request,$analyzedAnswers['score'],$analyzedAnswers['wrongAnswers'],'Vocabulary');
+
+    }
+
+    public function analyzeVocabularies($answers,$lang='nl') : array
+    {
+        $count_quiz_answers=count($answers);
+        $count_wrong_answers=$count_quiz_answers;
         $wrong_answers=[];
 
-        foreach($request->quiz_answers as $answer)
+        foreach($answers as $answer)
         {
-            if(strtolower($answer[$request->answers_lang])!=strtolower($answer['answer']))
+            if(strtolower($answer[$lang])!=strtolower($answer['answer']))
             {
                 array_push(
                     $wrong_answers,
                     [
                         'answer'=>$answer['answer'],
-                        'right_answer'=>$answer[$request->answers_lang],
-                        'translation_answer'=>$answer[$request->answers_lang=='nl' ? 'en' : 'nl']
+                        'right_answer'=>$answer[$lang],
+                        'translation_answer'=>$answer[$lang=='nl' ? 'en' : 'nl']
                     ]);
 
-                --$checked_answers;
+                --$count_wrong_answers;
             }
         }
 
-        $percentage=($checked_answers/$count_quiz_answers)*100;
+        $score=ceil(($count_wrong_answers/$count_quiz_answers)*100);
 
-        return $this->createQuiz($request,$percentage,$wrong_answers,'Vocabulary');
-
+        return [
+            'wrongAnswers'=>$wrong_answers,
+            'score'=>$score
+        ];
     }
 
     public function checkGrammar(Request $request) : RedirectResponse
@@ -144,6 +154,7 @@ class QuizRepository{
                     'perfectum'=>null
                 ]
             ];
+
             $right_answer=[
                 'name'=>$vocabularyName,
                 'grammar'=>[

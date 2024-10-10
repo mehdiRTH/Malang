@@ -3,11 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\QuizRequest;
-use App\Http\Resources\QuizPerformanceResource;
-use App\Http\Resources\QuizResource;
-use App\Models\QuizPerformance;
-use App\Models\Scopes\QuizScope;
-use App\Models\Vocabulary;
 use App\Repositories\QuizRepository;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;

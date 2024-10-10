@@ -21,5 +21,6 @@ class ExamenQuizResource extends JsonResource
             '2'=>QuizResource::collection($this[2]),
             '3'=>QuizResource::collection($this[3]),
         ];
+
     }
 }

@@ -49,7 +49,7 @@ Route::middleware('auth')->group(function () {
     Route::prefix('examen')->controller(ExamenController::class)->group(function(){
         Route::get('','index')->name('examen.index');
         Route::get('custom_examen/{start_date}/{end_date}','generateExam')->name('examen.custom_examen');
-        Route::post('check_answers','check_answers')->name('examen.check_answers');
+        Route::post('check_answers','checkAnswers')->name('examen.check_answers');
     });
 });
 

@@ -21,7 +21,7 @@ class ExamenResource extends JsonResource
             'startDate'  => $this['startDate'],
             'endDate'    => $this['endDate'],
             'vocabularies' => Vocabulary::whereDate('date','>=',$this['startDate'])->whereDate('date','<=',$this['endDate'])->count(),
-            'exam' => auth()->user()->exam()->whereDate('start_date','>=',$this['startDate'])->whereDate('end_date','<=',$this['endDate'])->first()
+            'exam' => auth()->user()->exams()->whereDate('start_date','>=',$this['startDate'])->whereDate('end_date','<=',$this['endDate'])->first()
         ];
     }
 }

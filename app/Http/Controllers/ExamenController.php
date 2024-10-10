@@ -2,13 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Resources\ExamenQuizResource;
-use App\Models\Exam;
+
 use App\Repositories\ExamenRepository;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
-use Inertia\Response;
 
 
 class ExamenController extends Controller
@@ -27,34 +24,13 @@ class ExamenController extends Controller
 
     public function generateExam($start_date,$end_date)
     {
-        $exam=$this->user->exam()
-                    ->whereDate('start_date','>=',$start_date)
-                    ->whereDate('end_date','<=',$end_date)
-                    ->first();
-
-        if(!$exam)
-        {
-            $exam=$this->user->exam()->create([
-                'end_date'=>$start_date,
-                'start_date'=>$end_date,
-                'score'=>0
-            ]);
-        }
-
-        $vocb= $this->user->vocabularies()
-                          ->whereDate('date','>=',$start_date)
-                          ->whereDate('date','<=',$end_date)->inRandomOrder()->get()->toArray();
-
-        $perChunk = ceil(count($vocb) / 4);
-
-        return Inertia::render($this->prefix.'Types/Vocabularies',[
-            'dividedVocabularies'=>new ExamenQuizResource(array_chunk($vocb,$perChunk)),
-            'exam'=>$exam
-        ]);
+        return Inertia::render(
+            $this->prefix.'Types/Vocabularies',
+            $this->examenRepository->generateExamData($start_date,$end_date));
 
     }
 
-    public function check_answers(Request $request)
+    public function checkAnswers(Request $request)
     {
        return $this->examenRepository->check_answers($request);
 
