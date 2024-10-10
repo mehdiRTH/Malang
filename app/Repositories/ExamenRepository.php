@@ -51,11 +51,11 @@ class ExamenRepository{
             return $weekList;
     }
 
-    public function generateExamData($start_date,$end_date)
+    public function generateExamProps($start_date,$end_date)
     {
         $exam=$this->user->exams()
                     ->whereDate('start_date','>=',$start_date)
-                    ->whereDate('end_date','<=',$end_date)
+                    ->whereDate(column: 'end_date','<=',$end_date)
                     ->firstOrCreate(
                         [
                             'start_date' => $start_date,

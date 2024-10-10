@@ -26,7 +26,7 @@ class ExamenController extends Controller
     {
         return Inertia::render(
             $this->prefix.'Types/Vocabularies',
-            $this->examenRepository->generateExamData($start_date,$end_date));
+            $this->examenRepository->generateExamProps($start_date,$end_date));
 
     }
 
