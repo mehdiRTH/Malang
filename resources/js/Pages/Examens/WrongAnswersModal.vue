@@ -22,7 +22,7 @@ const returnedAnswers=((answers)=>{
     <h1 class="font-semibold text-center mt-4 text-3xl">Examen Results</h1>
     <div class="max-w-3xl mx-auto mt-8 w-full block">
         <div class="flex items-center justify-center">
-            <MainButton v-for="(item,idx) in examenResults" :color="index==idx ? 'blue-400' : 'gray-800'" @click="index=idx" >{{ (idx+1)+(idx+1==3 ?  'rd' : 'st') }} Exam</MainButton>
+            <MainButton v-for="(item,idx) in examenResults" :color="index==idx ? 'blue-600' : 'gray-800'" @click="index=idx" >{{ (idx+1)+(idx+1==3 ?  'rd' : 'st') }} Exam</MainButton>
         </div>
         <!-- {{ examenResults[index] }} -->
         <div class="flex flex-wrap items-center justify-center gap-5 md:gap-10 m-3 mt-10">
@@ -84,7 +84,7 @@ const returnedAnswers=((answers)=>{
                 </tr>
             </tbody>
         </table>
-        <Paginate :data="examenResults[index].wrong_answers" :key="index.toString()" @returnedData="returnedAnswers" />
+        <Paginate :data="examenResults[index].wrongAnswers" :key="index.toString()" @returnedData="returnedAnswers" />
     </div>
 </Modal>
 </template>

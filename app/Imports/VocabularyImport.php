@@ -18,11 +18,13 @@ class VocabularyImport implements ToCollection
     {
         unset($collection[0]);
         $grammar=null;
+        $vocabularies=[];
         foreach($collection as $key=>$vocabulary)
         {
             if($vocabulary[0]!=null)
             {
                 $theme=null;
+                //Save theme from Excel
                 if($vocabulary[4])
                 {
                     $theme=Theme::where('name',$vocabulary[4])->first('id');
@@ -34,6 +36,7 @@ class VocabularyImport implements ToCollection
                     }
                 }
 
+                //Save Vocabulary Grammar
                 if($vocabulary[5]!=null && $vocabulary[6]!=null && $vocabulary[6]!=null)
                 {
                     $grammar=[
@@ -45,13 +48,17 @@ class VocabularyImport implements ToCollection
                         ];
                 }
 
+                $vocabularyTransition=[
+                    'nl'=>$vocabulary[3],
+                    'ar'=>$vocabulary[2],
+                    'en'=>$vocabulary[1]
+                ];
+
+                array_push($vocabularies,$vocabularyTransition);
+
                 Vocabulary::create([
                     'name'=>$vocabulary[0],
-                    'translations'=>[
-                        'nl'=>$vocabulary[3],
-                        'ar'=>$vocabulary[2],
-                        'en'=>$vocabulary[1]
-                    ],
+                    'translations'=>$vocabularyTransition,
                     'vocabulary_grammar'=>$grammar,
                     'date'=>date('Y-m-d'),
                     'user_id'=>$this->user->id,

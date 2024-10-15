@@ -7,6 +7,7 @@ use App\Http\Resources\ExamenQuizResource;
 use App\Http\Resources\ExamenResource;
 use App\Models\Exam;
 use Carbon\CarbonPeriod;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -25,7 +26,7 @@ class ExamenRepository{
         ];
     }
 
-    public function getMonthWeeks()
+    public function getMonthWeeks(): array
     {
         $period = CarbonPeriod::create(now()->addMonth(-1)->startOfMonth()->format('Y-m-d'), '1 week', now()->endOfMonth()->format('Y-m-d'));
             $weekList = [];
@@ -51,11 +52,11 @@ class ExamenRepository{
             return $weekList;
     }
 
-    public function generateExamProps($start_date,$end_date)
+    public function generateExamProps($start_date,$end_date): array
     {
         $exam=$this->user->exams()
                     ->whereDate('start_date','>=',$start_date)
-                    ->whereDate(column: 'end_date','<=',$end_date)
+                    ->whereDate('end_date','<=',$end_date)
                     ->firstOrCreate(
                         [
                             'start_date' => $start_date,
@@ -78,53 +79,49 @@ class ExamenRepository{
         ];
     }
 
-    public function check_answers(Request $request)
+    public function checkAnswers(Request $request) : RedirectResponse
     {
-
-        $examData=[
-            ['wrong_answer_number'=>count($request->quiz_answer[0]),'score'=>0,'wrong_answers'=>[]],
-            ['wrong_answer_number'=>count($request->quiz_answer[1]),'score'=>0,'wrong_answers'=>[]],
-            ['wrong_answer_number'=>count($request->quiz_answer[2]),'score'=>0,'wrong_answers'=>[]],
-            ['wrong_answer_number'=>count($request->quiz_answer[3]),'score'=>0,'wrong_answers'=>[]]
-        ];
         $exam=Exam::find($request->exam);
 
         if($request->isDone==false)
         {
             $exam->increment('attempts');
-            foreach($request->quiz_answer as $key=>$quizPart)
-            {
-                //Calling the function that return the wrong answer and score of the quiz
-                $analyzedAnswers=(new QuizRepository())->analyzeVocabularies($quizPart);
-
-                $examData[$key]['wrongAnswers']=$analyzedAnswers['wrongAnswers'];
-                $examData[$key]['score']=$analyzedAnswers['score'];
-
-            }
 
             return back()->with([
-                'examen_results'=>$examData
+                'examen_results'=>$this->analyzeExam($request->quiz_answer,false)
             ]);
         }else{
-            $wrongAnswers=[];
-
-            foreach($request->quiz_answer as $key=>$quizPart)
-            {
-                //Calling the function that return the wrong answer and score of the quiz
-                $analyzedAnswers=(new QuizRepository())->analyzeVocabularies($quizPart);
-
-                //Push wrong Answers to this array to save after
-                array_push($wrongAnswers,$analyzedAnswers['wrongAnswers']);
-            }
 
             $exam->update([
                 'score'=>$request->globalScore,
-                'wrong_answers'=>$wrongAnswers
+                'wrong_answers'=>$this->analyzeExam($request->quiz_answer,true)
             ]);
 
             return redirect()->route('examen.index');
         }
 
+    }
+
+    public function analyzeExam($examAnswers,$storeExamData) : array
+    {
+        $examResults=[];
+        foreach($examAnswers as $key=>$quizPart)
+        {
+            //Calling the function that return the wrong answer and score of the quiz
+            $analyzedAnswers=(new QuizRepository())->analyzeVocabularies($quizPart);
+
+            //Check if it for showcase exam results or only the wrong answers to save them into exam infos
+            if(!$storeExamData)
+            {
+                $examResults[$key]['wrongAnswers']=$analyzedAnswers['wrongAnswers'];
+                $examResults[$key]['score']=$analyzedAnswers['score'];
+            }else{
+                $examResults[$key]=$analyzedAnswers['wrongAnswers'];
+            }
+
+        }
+
+        return $examResults;
     }
 
 }

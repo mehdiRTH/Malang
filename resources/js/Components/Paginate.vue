@@ -28,8 +28,13 @@ watch(index,(newVal,oldVal)=>{
 </script>
 <template>
     <div class="flex items-center justify-between mt-6 pb-12">
-        <button @click="index==0 ? index : index-=1"
-            class="flex items-center px-5 py-2 text-sm text-gray-700 capitalize transition-colors duration-200 bg-white border rounded-md gap-x-2 hover:bg-gray-100 hover:bg-transparent dark:bg-gray-900 dark:text-gray-200 dark:border-gray-700 dark:hover:bg-gray-800">
+        <button @click="index==0 ? index : index-=1" :disabled="index==0"
+            class="flex items-center px-5 py-2 text-sm text-gray-700 capitalize transition-colors duration-200 border rounded-md gap-x-2 "
+            :class="{
+                ' bg-white':index!=0,
+                ' bg-gray-200':index==0
+                }"
+            >
             <faIcon :icon="faArrowLeftLong" class="w-3 h-3 rtl:-scale-x-100" />
             <span>
                 Previous
@@ -45,9 +50,12 @@ watch(index,(newVal,oldVal)=>{
                 </div>
             </div>
         </div>
-
-        <button @click="index==currentData.length ? index=index : index+=1"
-            class="flex items-center px-5 py-2 text-sm text-gray-700 capitalize transition-colors duration-200 bg-white border rounded-md gap-x-2 hover:bg-transparent hover:bg-gray-100 dark:bg-gray-900 dark:text-gray-200 dark:border-gray-700 dark:hover:bg-gray-800">
+        <button @click="index==currentData.length ? index=index : index+=1" :disabled="(currentData.length-1)==index"
+            class="flex items-center px-5 py-2 text-sm text-gray-700 capitalize transition-colors duration-200  border rounded-md gap-x-2"
+            :class="{
+                ' bg-white':(currentData.length-1)!=index,
+                ' bg-gray-200':(currentData.length-1)==index
+                }">
             <span>
                 Next
             </span>

@@ -11,10 +11,8 @@ use Inertia\Inertia;
 class ExamenController extends Controller
 {
     private $prefix;
-    private $user;
     public function __construct(public ExamenRepository $examenRepository){
         $this->prefix='Examens/';
-        $this->user=auth()->user();
     }
 
     public function index()
@@ -32,7 +30,7 @@ class ExamenController extends Controller
 
     public function checkAnswers(Request $request)
     {
-       return $this->examenRepository->check_answers($request);
+       return $this->examenRepository->checkAnswers($request);
 
     }
 }
