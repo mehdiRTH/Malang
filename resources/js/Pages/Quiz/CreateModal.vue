@@ -12,7 +12,8 @@ import { ThemeData } from '@/types/Themes/ThemeData';
 
 const props=defineProps<{
     show:Boolean,
-    themes:ThemesInterface
+    themes:ThemesInterface,
+    type:string
 }>()
 
 const form=useForm({
@@ -20,8 +21,8 @@ const form=useForm({
     quiz_date:'',
     theme:{} as ThemeData,
     answer_language:null,
-    type_search:'Date',
-    isThemeGrammar:false
+    type_search:props.type,
+    isThemeGrammar:props.type=='Grammar' ? true : false
 })
 
 const count_vocabularies_number_error : Ref<number | null>=ref(null)
@@ -51,7 +52,7 @@ const switchTypeSearch=((type : string)=>{
 
             <div v-if="count_vocabularies_number_error==null">
                 <MainInput inputType="number" v-model="form.vocabulary_number"  label="how many vocabularies (min 10 vocabularies)" :error="form.errors.vocabulary_number" min="10" class="my-4" />
-                <Label label="Type of Quiz Vocabularies" error="" class="my-4">
+                <Label v-if="!form.isThemeGrammar" label="Type of Quiz Vocabularies" error="" class="my-4">
                     <div class=" bg-white mx-8 shadow rounded-full h-10 my-4 flex p-1 relative items-center">
                         <div class="w-full flex justify-center">
                             <button @click="switchTypeSearch('Theme')" type="button">{{ form.type_search=='Theme' ? 'Date' : 'Theme' }}</button>
@@ -65,30 +66,13 @@ const switchTypeSearch=((type : string)=>{
                         </span>
                     </div>
                 </Label>
-                <MainInput v-if="form.type_search=='Date'" v-model="form.quiz_date" inputType="date" label="Vocabularies Date" :error="form.errors.quiz_date" class="my-4"/>
+                <MainInput v-if="form.type_search=='Date' || form.isThemeGrammar" v-model="form.quiz_date" inputType="date" :label="(form.isThemeGrammar ? 'Grammar Vocabularies' : 'Vocabularies')+' Date'" :error="form.errors.quiz_date" class="my-4"/>
                 <Label v-else label="Themes" :error="form.errors.theme" class="my-4">
                     <select v-model="form.theme" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
                         <option value="" selected disabled hidden>Choose a Theme</option>
                         <option v-for="theme in themes.data" :key="theme.id" :value="theme" >{{ theme.name }}</option>
                     </select>
                 </Label>
-                <div v-if="form.type_search=='Theme' && form.theme.name=='Grammar'">
-                    <Label label="Type of Quiz Vocabularies" :error="form.errors.isThemeGrammar" class="my-4">
-                        <div class=" bg-white mx-8 shadow rounded-full h-10 my-4 flex p-1 relative items-center">
-                            <div class="w-full flex justify-center">
-                                <button @click="form.isThemeGrammar=false" type="button">Vocabularies</button>
-                            </div>
-                            <div class="w-full flex justify-center">
-                                <button @click="form.isThemeGrammar=true" type="button">Grammar</button>
-                            </div>
-                            <span :class="{'right-1':form.isThemeGrammar,'left-1':!form.isThemeGrammar}"
-                            class="elSwitch bg-gray-800 shadow text-white flex items-center justify-center w-1/2 rounded-full h-8 transition-all top-[4px] absolute">
-                                {{ form.isThemeGrammar ? 'Grammar' : 'Vocabularies' }}
-                            </span>
-                        </div>
-                    </Label>
-                    <MainInput v-if="form.isThemeGrammar" v-model="form.quiz_date" inputType="date" label="Vocabularies Date" :error="form.errors.quiz_date" class="my-4"/>
-                </div>
                 <Label v-if="!form.isThemeGrammar" label="Language to answer vocabularies" :error="form.errors.answer_language" class="my-4">
                     <select v-model="form.answer_language" id="countries" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
                         <option value="null">Choose a language</option>

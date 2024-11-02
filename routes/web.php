@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ExamenController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\Quiz\GrammarController;
 use App\Http\Controllers\QuizController;
 use App\Http\Controllers\ThemeController;
 use App\Http\Controllers\VocabularyController;
@@ -35,22 +36,31 @@ Route::middleware('auth')->group(function () {
     //vocabularies
     Route::resource('vocabularies',VocabularyController::class);
 
-    //Quiz
+    //Quiz Vocabularies
+    Route::controller(QuizController::class)->group(function(){
+        Route::get('quiz','index')->name('quiz.index');
+        Route::get('quiz/generate','generate')->name('quiz.generate');
+        Route::post('quiz_check_answers','checkAnswers')->name('quiz.check_answers');
+    });
 
-    Route::get('quiz',[QuizController::class,'index'])->name('quiz.index');
-    Route::get('quiz/generate',[QuizController::class,'generate'])->name('quiz.generate');
-    // Route::get('quiz_vocabularies/{vocabularies}',[QuizController::class,'quiz'])->name('quiz.quiz');
-    Route::post('quiz_check_answers',[QuizController::class,'checkAnswers'])->name('quiz.check_answers');
+    //Quiz Grammar
+    Route::controller(GrammarController::class)->prefix('quiz_grammar')->group(function(){
+        Route::get('','index')->name('quiz_grammar.index');
+        Route::get('generate','generate')->name('quiz_grammar.generate');
+        // Route::post('quiz_check_answers','checkAnswers')->name('quiz.check_answers');
+    });
 
     //Themes
     Route::resource('themes',ThemeController::class);
 
     //Examens
-    Route::prefix('examen')->controller(ExamenController::class)->group(function(){
-        Route::get('','index')->name('examen.index');
-        Route::get('custom_examen/{start_date}/{end_date}','generateExam')->name('examen.custom_examen');
-        Route::post('check_answers','checkAnswers')->name('examen.check_answers');
+    Route::prefix('exams')->controller(ExamenController::class)->group(function(){
+        Route::get('','index')->name('exams.index');
+        Route::get('custom_examen/{start_date}/{end_date}','generateExam')->name('exams.custom_examen');
+        Route::post('check_answers','checkAnswers')->name('exams.check_answers');
     });
+
+
 });
 
 

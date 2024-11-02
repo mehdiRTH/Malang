@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('quiz_performances', function (Blueprint $table) {
-            $table->enum('type',['Date','Theme','Grammar'])->nullable();
+            $table->enum('type',['Date','Theme','Grammar','Vocabulary'])->nullable();
         });
     }
 

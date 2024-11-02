@@ -16,7 +16,7 @@ const generateExam=((startDate : Date,endDate:Date)=>{
     <div class="container px-5 py-14 mx-auto">
         <div class="flex flex-wrap -m-4 text-center gap-4">
             <div v-for="exam in examens.data" class="hover:scale-105 duration-500">
-                <Link v-if="exam.vocabularies>0" :href="route('examen.custom_examen',{start_date:exam.startDate,end_date:exam.endDate})" class="p-4 sm:w-1/2 lg:w-1/3 w-full">
+                <Link v-if="exam.vocabularies>0" :href="route('exams.custom_examen',{start_date:exam.startDate,end_date:exam.endDate})" class="p-4 sm:w-1/2 lg:w-1/3 w-full">
                     <div class=" flex items-center  justify-between p-4  rounded-lg bg-white shadow-indigo-50 shadow-md">
                     <div>
                         <h2 class="text-gray-900 text-lg font-bold">Exam of the {{ exam.weekNumber }} week</h2>

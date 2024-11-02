@@ -68,8 +68,10 @@ class ExamenRepository{
                     );
 
         $vocabularies= $this->user->vocabularies()
-                          ->whereDate('date','>=',$start_date)
-                          ->whereDate('date','<=',$end_date)->inRandomOrder()->get()->toArray();
+                          ->whereBetween('date',[$start_date, $end_date])
+                          ->inRandomOrder()
+                          ->get()
+                          ->toArray();
 
         $perChunk = ceil(count($vocabularies) / 4);
 
@@ -97,7 +99,7 @@ class ExamenRepository{
                 'wrong_answers'=>$this->analyzeExam($request->quiz_answer,true)
             ]);
 
-            return redirect()->route('examen.index');
+            return redirect()->route('exams.index');
         }
 
     }

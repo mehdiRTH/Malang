@@ -14,7 +14,7 @@ class GrammarResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        if(isset($this->translations['nl']))
+        if(isset($this->vocabulary_grammar['nl']))
         {
             return [
                 'name'=>$this->name,

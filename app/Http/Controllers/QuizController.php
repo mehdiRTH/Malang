@@ -17,7 +17,7 @@ class QuizController extends Controller
     }
     public function index()
     {
-        return Inertia::render('Quiz/Index',$this->quizRepository->indexData());
+        return Inertia::render('Quiz/Index',$this->quizRepository->indexQuizData());
     }
 
     public function generate(QuizRequest $request): RedirectResponse|Response

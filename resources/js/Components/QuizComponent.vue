@@ -116,7 +116,7 @@ const submitExam=((isDoneParam : boolean)=>{
     examForm.isDone= isDoneParam ? true : false
     examForm.globalScore=calculateExamScore()
 
-    examForm.post(route('examen.check_answers'),{
+    examForm.post(route('exams.check_answers'),{
     preserveState:true,
     onSuccess:(()=>{
         isFinished.value=true

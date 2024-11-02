@@ -16,7 +16,8 @@ const menuList=ref([
     {url:'dashboard',label:'Dashboard'},
     {url:'vocabularies.index',label:'Vocabularies'},
     {url:'quiz.index',label:'Vocabulary Quiz'},
-    {url:'examen.index',label:'Examens'},
+    {url:'quiz_grammar.index',label:'Grammar Quiz'},
+    {url:'exams.index',label:'Examens'},
     {url:'themes.index',label:'Themes'}
 ])
 
