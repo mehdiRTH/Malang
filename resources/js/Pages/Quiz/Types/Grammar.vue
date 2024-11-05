@@ -60,21 +60,23 @@ const setGrammarSteps =(()=>{
     if(stepGrammar.value=='presens')
     {
         addedAnswers.value[index.value].answer = {presens:null,imperfectum:null,perfectum:null,name:props.quiz_vocabularies.data[index.value].name};
-
         addedAnswers.value[index.value].answer.presens=answers.value
         stepGrammar.value='imperfectum'
+
     }else if(stepGrammar.value=='imperfectum'){
+
         addedAnswers.value[index.value].answer.imperfectum=answers.value
         stepGrammar.value='perfectum'
+
     }else{
+
         if(quiz_length-1==index.value) buttonLabel.value='Done'
         if(quiz_length==index.value)
         {
             addedAnswers.value[index.value].answer.perfectum=answers.value
-
             form.grammar_answer=addedAnswers.value;
+            stepGrammar.value='presens';
             submit(false)
-
         }else{
             addedAnswers.value[index.value].answer.perfectum=answers.value
             ++index.value;

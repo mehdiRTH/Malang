@@ -188,7 +188,6 @@ class QuizRepository{
 
     public function analyzeWrongAnswers($types, $answer,$isNotCorrect) : mixed
     {
-        $wrongAnswers=[];
         $nlAnswer=$answer['nl'];
         //create a template to initialize the answers
         $answerTemplate=[

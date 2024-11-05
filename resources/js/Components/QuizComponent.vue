@@ -209,7 +209,7 @@ onMounted(()=>{
                             'bg-orange-200':typeScoreRate()<=80 && typeScoreRate()>=40,
                             'bg-red-200':typeScoreRate()<40,
                             }" class="rounded-full  p-6">
-                            <div :class="{
+                        <div :class="{
                             'bg-green-500':typeScoreRate()>=80,
                             'bg-orange-500':typeScoreRate()<=80 && typeScoreRate()>=40,
                             'bg-red-500':typeScoreRate()<40,
