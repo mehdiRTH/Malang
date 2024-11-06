@@ -19,7 +19,6 @@ class ExamenController extends Controller
 
     public function index()
     {
-        // Mail::to(auth()->user()->email)->send(new VocabularyMail([['en'=>'english test','ar'=>'arabic test','nl'=>'Nederland test']],[['name'=>'Name test','presens'=>'Presens test','imperfectum'=>'imperfectum test','perfectum'=>'perfectum test']]));
         return Inertia::render($this->prefix.'Index',$this->examenRepository->indexData());
     }
 

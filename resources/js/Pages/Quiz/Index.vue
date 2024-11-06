@@ -7,7 +7,7 @@ import TdTable from '@/Components/Table/TdTable.vue';
 import ThTable from '@/Components/Table/ThTable.vue';
 import DisplayCards from '@/Components/DisplayCards.vue';
 import { CardsType } from '@/types/CardsType';
-import { faPercentage, faFileWord } from '@fortawesome/free-solid-svg-icons';
+import { faPercentage, faFileWord, faNetworkWired } from '@fortawesome/free-solid-svg-icons';
 import { QuizPerformanceInterface } from '@/types/QuizPerformance/QuizPerformanceInterface';
 import { ThemesInterface } from '@/types/Themes/ThemesInterface';
 
@@ -26,9 +26,9 @@ const props=defineProps<{
 const toggleModal : Ref<boolean> = ref(false)
 const cardsItems : CardsType[]=[
     {Label:props.last_month_success_rate+'% Quiz rate',subLabel:'last month','color':'blue',icon:faPercentage},
-    {Label:props.last_month_uploaded_vocabularies+' Vocabularies',subLabel:'last month','color':'red',icon:faFileWord},
-    {Label:props.this_month_success_rate+'% Quiz rate',subLabel:'This month','color':'indigo',icon:faPercentage},
-    {Label:props.this_month_uploaded_vocabularies+' Vocabularies',subLabel:'This month','color':'orange',icon:faFileWord}
+    {Label:props.last_month_uploaded_vocabularies+' Vocabularies',subLabel:'last month','color':'red',icon:faNetworkWired},
+    {Label:props.this_month_success_rate+'% Quiz rate',subLabel:'This month','color':'red',icon:faPercentage},
+    {Label:props.this_month_uploaded_vocabularies+' Vocabularies',subLabel:'This month','color':'orange',icon:faNetworkWired}
 ]
 
 </script>
@@ -36,7 +36,7 @@ const cardsItems : CardsType[]=[
   <AuthenticatedLayout label="Quiz Performance">
         <CreateModal :show="toggleModal" :type="type" :themes="themes" @close="toggleModal=false" />
         <!-- Cards component -->
-        <DisplayCards :items="cardsItems" />
+        <DisplayCards :key="cardsItems" :items="cardsItems" />
 
         <MainTable label="Quiz Table" :meta="quiz_vocabularies.meta" @click_create="toggleModal=!toggleModal">
             <template #ThTable>

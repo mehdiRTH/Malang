@@ -1,27 +1,21 @@
 <script lang="ts" setup>
 import { useForm, usePage } from '@inertiajs/vue3';
 import { onMounted, ref, Ref } from 'vue';
-import { faCheck } from '@fortawesome/free-solid-svg-icons';
 import MainInput from './MainInput.vue';
 import MainButton from './MainButton.vue';
 import QuizWrongAnswerModal from '@/Pages/Quiz/WrongAnswerModal.vue';
 import ExamWrongAnswersModal from '@/Pages/Examens/WrongAnswersModal.vue';
 import { QuizComponentEnum } from '@/types/QuizComponentEnum';
-
+import ResultsComponent from './Quiz/ResultsComponent.vue';
+import { quizVocabularyInterface } from '@/types/QuizPerformance/QuizVocabularyInterface';
 interface ExamType{
     id:string
-}
-
-interface quizVocabularyType{
-    nl:string;
-    en:string;
-    answer:Object
 }
 
 const props=defineProps<{
     componentType:QuizComponentEnum,
     quizType:string,
-    examData:Array<quizVocabularyType>,
+    examData:Array<quizVocabularyInterface>,
     exam?:ExamType
 }>()
 
@@ -32,7 +26,7 @@ const index : Ref<number>=ref(0)
 const subIndex : Ref<number>=ref(0)
 const buttonLabel : Ref<string>=ref('Next')
 const isFinished : Ref<boolean>=ref(false)
-const url  = new URL(window.location)
+const url : String | URL  = new URL(window.location)
 const openWrongAnswer : Ref<boolean> = ref(false)
 
 
@@ -46,7 +40,7 @@ const form=useForm({
 })
 
 const examForm=useForm({
-    quiz_answer:[] as Array<quizVocabularyType>,
+    quiz_answer:[] as Array<quizVocabularyInterface>,
     exam:props.exam?.id,
     isDone:false,
     globalScore:0
@@ -201,39 +195,18 @@ onMounted(()=>{
                     </div>
                 </div>
             </div>
-            <div v-else class="flex items-center justify-center bg-gray-100">
-                <div class="rounded-lg bg-gray-50 px-16 py-14">
-                    <div class="flex justify-center">
-                        <div :class="{
-                            'bg-green-200':typeScoreRate()>=80,
-                            'bg-orange-200':typeScoreRate()<=80 && typeScoreRate()>=40,
-                            'bg-red-200':typeScoreRate()<40,
-                            }" class="rounded-full  p-6">
-                        <div :class="{
-                            'bg-green-500':typeScoreRate()>=80,
-                            'bg-orange-500':typeScoreRate()<=80 && typeScoreRate()>=40,
-                            'bg-red-500':typeScoreRate()<40,
-                            }" class="flex h-16 w-16 items-center justify-center rounded-full p-4">
-                                <faIcon class="h-8 w-8 text-white" :icon="faCheck" />
-                            </div>
-                        </div>
-                    </div>
-                    <h3 class="my-4 text-center text-3xl font-semibold text-gray-700">Congratuation!!!</h3>
-                    <p class="text-center font-normal text-gray-600">Your Score is {{ typeScoreRate() }}%</p>
-                    <div class="inline-flex">
-                        <button @click="retry" type="button" class="mx-1 mt-10 block rounded-xl border-4 border-transparent bg-info px-6 py-3 text-center text-base font-medium text-orange-100 outline-8 hover:outline hover:duration-300">
-                            Practice Again
-                        </button>
-                        <button type="button" @click="openWrongAnswer=!openWrongAnswer" class="mx-1 mt-10 block rounded-xl border-4 border-transparent bg-blue-600 px-6 py-3 text-center text-base font-medium text-white outline-8 hover:outline hover:duration-300">
-                            OpenYour Wrong Answer
-                        </button>
-                        <button type="submit" @click="componentType=='Vocabulary' ? VocabularySubmit(true) : submitExam(true)" class="mx-1 mt-10 block rounded-xl border-4 border-transparent bg-success px-6 py-3 text-center text-base font-medium text-white outline-8 hover:outline hover:duration-300">
-                            Save My Score
-                        </button>
-                    </div>
-                </div>
+            <ResultsComponent
+                v-else
+                :score="typeScoreRate()"
+                :key="typeScoreRate()"
+                @retry="retry"
+                @wrongAnswer="openWrongAnswer=!openWrongAnswer"
+                @saveScore="componentType=='Vocabulary' ? VocabularySubmit(true) : submitExam(true)">
+
                 <QuizWrongAnswerModal v-if="componentType=='Vocabulary'" :show="openWrongAnswer" :key="openWrongAnswer.toString()" @close="openWrongAnswer=false" />
                 <ExamWrongAnswersModal v-else :show="openWrongAnswer" :key="openWrongAnswer.toString()+''" @close="openWrongAnswer=false" />
-            </div>
+
+            </ResultsComponent>
+
         </div>
 </template>

@@ -6,6 +6,7 @@ namespace App\Repositories;
 use App\Http\Requests\QuizRequest;
 use App\Http\Resources\GrammarResource;
 use App\Http\Resources\QuizPerformanceResource;
+use App\Http\Resources\QuizResource;
 use App\Http\Resources\ThemeResource;
 use App\Models\Scopes\QuizScope;
 use App\Models\Theme;
@@ -29,7 +30,7 @@ class QuizRepository{
 
         return [
             'quiz_vocabularies'=>QuizPerformanceResource::collection($this->user->quiz_performances()->orderBy('created_at','desc')->where('type',$type)->paginate(5)),
-            'themes'=>ThemeResource::collection(Theme::all()),
+            'themes'=>ThemeResource::collection(Theme::where('name','!=','Grammar')->orderBy('created_at','desc')->get()),
             'this_month_success_rate'=>ceil($this->user->quiz_performances()->whereBetween('created_at',[$this_month_start_of_month, $this_month_end_of_month])->where('type',$type)->pluck('success_rate')->avg()),
             'this_month_uploaded_vocabularies'=>$this->user->vocabularies()->withoutGlobalScope(QuizScope::class)->whereBetween('created_at',[$this_month_start_of_month, $this_month_end_of_month])->where('vocabulary_grammar',$type=='Vocabulary' ? '=' : '!=',null)->count(),
             'last_month_success_rate'=>ceil($this->user->quiz_performances()->whereBetween('created_at',[$last_month_start_of_month, $last_month_end_of_month])->where('type',$type)->pluck('success_rate')->avg()),
@@ -40,7 +41,7 @@ class QuizRepository{
 
     public function generateQuiz(QuizRequest $request)
     {
-        $isGrammarQuiz=(bool)$request->isThemeGrammar;
+        $isGrammarQuiz=$request->isThemeGrammar=='false' ? false : true;
 
         if($request->type_search=='Date'){
             //Retrieve the requested vocabularies Directly With entered Date
@@ -60,7 +61,6 @@ class QuizRepository{
         }
 
         $countRequestVocabularies=count($requestedVocabularies->get());
-
         if($countRequestVocabularies < $request->vocabulary_number)
         {
             //If the requested number of vocabulary is less than the number of available vocabularies, an error is displayed in the user interface.
@@ -69,9 +69,10 @@ class QuizRepository{
             ]);
 
         }else{
+            $examVocabularies=$requestedVocabularies->inRandomOrder()->limit($request->vocabulary_number)->get();
             //Otherwise, the quiz will be generated based on the type whether it’s Grammar or Vocabulary
             return Inertia::render($isGrammarQuiz ? 'Quiz/Types/Grammar' : 'Quiz/Types/Vocabulary',[
-                'quiz_vocabularies'=>GrammarResource::collection($requestedVocabularies->inRandomOrder()->limit($request->vocabulary_number)->get())
+                'quiz_vocabularies'=>$isGrammarQuiz ? GrammarResource::collection($examVocabularies) : QuizResource::collection($examVocabularies)
             ]);
 
         }

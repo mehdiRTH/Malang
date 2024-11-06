@@ -109,7 +109,7 @@ class ExamenRepository{
         $examResults=[];
         foreach($examAnswers as $key=>$quizPart)
         {
-            //Calling the function that return the wrong answer and score of the quiz
+            //Calling the function that return the wrong answer and  the score of the quiz
             $analyzedAnswers=(new QuizRepository())->analyzeVocabularies($quizPart);
 
             //Check if it for showcase exam results or only the wrong answers to save them into exam infos
