@@ -4,9 +4,9 @@ import MainInput from '@/Components/MainInput.vue';
 import MainButton from '@/Components/MainButton.vue';
 import { Ref, ref } from 'vue';
 import { useForm } from '@inertiajs/vue3';
-import { faCheck } from '@fortawesome/free-solid-svg-icons';
 import WrongAnswerModal from '../WrongAnswerModal.vue';
 import ResultsComponent from '@/Components/Quiz/ResultsComponent.vue';
+
 const props=defineProps<{
     quiz_vocabularies:quiz_interface
 }>()
@@ -122,7 +122,7 @@ const retry=(()=>{
 
                 </div>
             </div>
-            <ResultsComponent :score="$page.props.auth.quiz_percentage" @retry="retry" @wrongAnswer="openWrongAnswer=!openWrongAnswer" @saveScore="submit(true)">
+            <ResultsComponent v-else :score="$page.props.auth.quiz_percentage" @retry="retry" @wrongAnswer="openWrongAnswer=!openWrongAnswer" @saveScore="submit(true)">
                 <WrongAnswerModal :show="openWrongAnswer" :key="openWrongAnswer.toString()" @close="openWrongAnswer=false" />
             </ResultsComponent>
         </div>

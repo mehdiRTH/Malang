@@ -10,6 +10,7 @@ use App\Http\Resources\QuizResource;
 use App\Http\Resources\ThemeResource;
 use App\Models\Scopes\QuizScope;
 use App\Models\Theme;
+use App\Models\Vocabulary;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -27,6 +28,18 @@ class QuizRepository{
         $this_month_end_of_month=now()->endOfMonth()->format('Y-m-d');
         $last_month_start_of_month=now()->startOfMonth()->subMonth()->format('Y-m-d');
         $last_month_end_of_month=now()->endOfMonth()->subMonth()->format('Y-m-d');
+        $available_dates=null;
+
+        if($type=='Grammar')
+        {
+            $available_dates=Vocabulary::whereHas('theme',function(Builder $builder){
+                $builder->where('name','Grammar');
+                })->selectRaw('DATE(created_at) as created_date')->distinct()->pluck('created_date');
+        }else{
+            $available_dates=$this->user->vocabularies()->whereHas('theme',function(Builder $builder){
+                $builder->where('name','!=','Grammar');
+                })->selectRaw('DATE(created_at) as created_date')->distinct()->pluck('created_date');
+        }
 
         return [
             'quiz_vocabularies'=>QuizPerformanceResource::collection($this->user->quiz_performances()->orderBy('created_at','desc')->where('type',$type)->paginate(5)),
@@ -35,7 +48,8 @@ class QuizRepository{
             'this_month_uploaded_vocabularies'=>$this->user->vocabularies()->withoutGlobalScope(QuizScope::class)->whereBetween('created_at',[$this_month_start_of_month, $this_month_end_of_month])->where('vocabulary_grammar',$type=='Vocabulary' ? '=' : '!=',null)->count(),
             'last_month_success_rate'=>ceil($this->user->quiz_performances()->whereBetween('created_at',[$last_month_start_of_month, $last_month_end_of_month])->where('type',$type)->pluck('success_rate')->avg()),
             'last_month_uploaded_vocabularies'=>$this->user->vocabularies()->withoutGlobalScope(QuizScope::class)->whereBetween('created_at',[$last_month_start_of_month, $last_month_end_of_month])->where('vocabulary_grammar',$type=='Vocabulary' ? '=' : '!=',null)->count(),
-            'type'=>$type
+            'type'=>$type,
+            'available_dates'=>$available_dates
         ];
     }
 

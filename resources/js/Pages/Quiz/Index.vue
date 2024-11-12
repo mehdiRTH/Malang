@@ -20,7 +20,8 @@ const props=defineProps<{
     this_month_uploaded_vocabularies:number,
     last_month_success_rate:number,
     last_month_uploaded_vocabularies:number,
-    type:string
+    type:string,
+    available_dates:Array
 }>()
 
 const toggleModal : Ref<boolean> = ref(false)
@@ -34,7 +35,7 @@ const cardsItems : CardsType[]=[
 </script>
 <template>
   <AuthenticatedLayout label="Quiz Performance">
-        <CreateModal :show="toggleModal" :type="type" :themes="themes" @close="toggleModal=false" />
+        <CreateModal :show="toggleModal" :type="type" :dates="available_dates" :themes="themes" @close="toggleModal=false" />
         <!-- Cards component -->
         <DisplayCards :key="cardsItems" :items="cardsItems" />
 

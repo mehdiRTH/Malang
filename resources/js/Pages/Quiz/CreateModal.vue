@@ -13,7 +13,8 @@ import { ThemeData } from '@/types/Themes/ThemeData';
 const props=defineProps<{
     show:Boolean,
     themes:ThemesInterface,
-    type:string
+    type:string,
+    dates:Array<Date>
 }>()
 
 const form=useForm({
@@ -51,7 +52,7 @@ const switchTypeSearch=((type : string)=>{
             <h1 class="text-white mb-4 mt-2 font-semibold text-2xl">Generate Quiz</h1>
 
             <div v-if="count_vocabularies_number_error==null">
-                <MainInput inputType="number" v-model="form.vocabulary_number"  label="how many vocabularies (min 10 vocabularies)" :error="form.errors.vocabulary_number" min="10" class="my-4" />
+                <MainInput inputType="number" v-model="form.vocabulary_number"  label="how many vocabularies" :error="form.errors.vocabulary_number" min="10" class="my-4" />
                 <Label v-if="!form.isThemeGrammar" label="Type of Quiz Vocabularies" error="" class="my-4">
                     <div class=" bg-white mx-8 shadow rounded-full h-10 my-4 flex p-1 relative items-center">
                         <div class="w-full flex justify-center">
@@ -66,7 +67,10 @@ const switchTypeSearch=((type : string)=>{
                         </span>
                     </div>
                 </Label>
-                <MainInput v-if="form.type_search=='Date' || form.isThemeGrammar" v-model="form.quiz_date" inputType="date" :label="(form.isThemeGrammar ? 'Grammar Vocabularies' : 'Vocabularies')+' Date'" :error="form.errors.quiz_date" class="my-4"/>
+                <!-- <MainInput v-if="form.type_search=='Date' || form.isThemeGrammar" v-model="form.quiz_date" inputType="date" :label="(form.isThemeGrammar ? 'Grammar Vocabularies' : 'Vocabularies')+' Date'" :error="form.errors.quiz_date" class="my-4"/> -->
+                <Label v-if="form.type_search=='Date' || form.isThemeGrammar" :label="(form.isThemeGrammar ? 'Grammar Vocabularies' : 'Vocabularies')+' Date'" :error="form.errors.quiz_date" class="my-4">
+                    <VueDatePicker  v-model="form.quiz_date" :teleport="true" :allowed-dates="dates" format="yyyy-MM-dd" model-type="yyyy-MM-dd"  />
+                </Label>
                 <Label v-else label="Themes" :error="form.errors.theme" class="my-4">
                     <select v-model="form.theme" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
                         <option value="" selected disabled hidden>Choose a Theme</option>

@@ -1,9 +1,11 @@
 import { LanguageEnum } from "../LanguageEnum";
+import { GrammarInterface } from "./GrammarInterface";
+import { TranslationsInterface } from "./TranslationssInterface";
 
 export interface VocabularyData{
     id: number;
     name:string;
-    languages_available:Array<LanguageEnum>;
-    date:Date;
+    translations:Array<TranslationsInterface>;
+    vocabulary_grammar:GrammarInterface;
 }
 

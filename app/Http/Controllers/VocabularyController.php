@@ -7,8 +7,10 @@ use App\Http\Resources\VocabularyResource;
 use App\Models\Scopes\QuizScope;
 use App\Models\Vocabulary;
 use App\Repositories\VocabularyRepository;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Inertia\Response;
 
 class VocabularyController extends Controller
 {
@@ -59,7 +61,7 @@ class VocabularyController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Vocabulary $vocabulary)
+    public function edit(Vocabulary $vocabulary): Response
     {
         return Inertia::render('Vocabulary/Create',[
             'vocabulary'=>$vocabulary
@@ -69,7 +71,7 @@ class VocabularyController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(VocabularyRequest $request, Vocabulary $vocabulary)
+    public function update(VocabularyRequest $request, Vocabulary $vocabulary) : RedirectResponse
     {
         $this->vocabularyRepository->update($request,$vocabulary);
 
@@ -79,10 +81,20 @@ class VocabularyController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Vocabulary $vocabulary)
+    public function destroy(Vocabulary $vocabulary): RedirectResponse
     {
         $this->vocabularyRepository->destroy($vocabulary);
 
+        return back();
+    }
+
+    /**
+     * Remove Multiple Vocabularies
+     */
+
+    public function destroyMultiple(Request $request) : RedirectResponse
+    {
+        $this->vocabularyRepository->destroyMultiple($request);
         return back();
     }
 }

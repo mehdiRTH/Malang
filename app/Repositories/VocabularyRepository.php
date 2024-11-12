@@ -11,7 +11,7 @@ use Maatwebsite\Excel\Facades\Excel;
 
 class VocabularyRepository{
 
-    public function store(VocabularyRequest $request)
+    public function store(VocabularyRequest $request) :void
     {
         $user=auth()?->user();
         if($request->createByUpload)
@@ -28,16 +28,19 @@ class VocabularyRepository{
 
     }
 
-    public function update(VocabularyRequest $request,Vocabulary $vocabulary)
+    public function update(VocabularyRequest $request,Vocabulary $vocabulary) : void
     {
+        $grammar=$request->grammar;
+
         $vocabulary->update([
             'name'=>$request->name,
-            'translations'=>$this->setTranslations($request->translations)
+            'translations'=>$this->setTranslations($request->translations),
+            'vocabulary_grammar'=> $grammar==null ? null : $grammar
         ]);
 
     }
 
-    public function setTranslations($translations)
+    public function setTranslations($translations) : object
     {
         $filteredTranslation=[];
 
@@ -49,9 +52,14 @@ class VocabularyRepository{
         return (object)$filteredTranslation;
     }
 
-    public function destroy(Vocabulary $vocabulary)
+    public function destroy(Vocabulary $vocabulary) : void
     {
         $vocabulary->delete();
+    }
+
+    public function destroyMultiple() : void
+    {
+
     }
 
 }
