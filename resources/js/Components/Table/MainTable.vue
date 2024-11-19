@@ -27,16 +27,18 @@ const emits=defineEmits(['click_create'])
                     <strong>30 done</strong> this month
                 </p> -->
                 </div>
-                <Link v-if="create_route" :href="create_route"  aria-expanded="false" aria-haspopup="menu" id=":r5:" class="relative middle none font-sans font-medium text-center transition-all disabled:opacity-50 disabled:shadow-none disabled:pointer-events-none rounded-lg text-xs text-blue-gray-500 hover:bg-blue-gray-500/10 active:bg-blue-gray-500/30" type="button">
+                <div v-if="create_route">
+                    <Link v-if="create_route" :href="create_route"  aria-expanded="false" aria-haspopup="menu" id=":r5:" class="relative middle none font-sans font-medium text-center transition-all disabled:opacity-50 disabled:shadow-none disabled:pointer-events-none rounded-lg text-xs text-blue-gray-500 hover:bg-blue-gray-500/10 active:bg-blue-gray-500/30" type="button">
+                        <span class="inline-flex items-center justify-center bg-gray-800 py-2 px-2.5 rounded-full text-white">
+                                <faIcon :icon="faAdd" /> &nbsp; Create
+                        </span>
+                    </Link>
+                    <button v-else @click="emits('click_create')" aria-expanded="false" aria-haspopup="menu" id=":r5:" class="relative middle none font-sans font-medium text-center transition-all disabled:opacity-50 disabled:shadow-none disabled:pointer-events-none rounded-lg text-xs text-blue-gray-500 hover:bg-blue-gray-500/10 active:bg-blue-gray-500/30" type="button">
                     <span class="inline-flex items-center justify-center bg-gray-800 py-2 px-2.5 rounded-full text-white">
                             <faIcon :icon="faAdd" /> &nbsp; Create
                     </span>
-                </Link>
-                <button v-else @click="emits('click_create')" aria-expanded="false" aria-haspopup="menu" id=":r5:" class="relative middle none font-sans font-medium text-center transition-all disabled:opacity-50 disabled:shadow-none disabled:pointer-events-none rounded-lg text-xs text-blue-gray-500 hover:bg-blue-gray-500/10 active:bg-blue-gray-500/30" type="button">
-                <span class="inline-flex items-center justify-center bg-gray-800 py-2 px-2.5 rounded-full text-white">
-                        <faIcon :icon="faAdd" /> &nbsp; Create
-                </span>
-                </button>
+                    </button>
+                </div>
             </div>
             <div class="p-6 overflow-x-scroll px-0 pt-0 pb-2">
                 <table class="w-full min-w-[640px] table-auto">
