@@ -3,60 +3,43 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { Head } from '@inertiajs/vue3';
 import DisplayCards from '@/Components/DisplayCards.vue';
 import { CardsType } from '@/types/CardsType';
-import { faPercentage, faNetworkWired } from '@fortawesome/free-solid-svg-icons';
+import { faPercentage, faCheck, faFileContract, faSpellCheck, faClipboard} from '@fortawesome/free-solid-svg-icons';
 import { ref, Ref } from 'vue';
 import { DataDate } from '@/types/Enums/DataDate';
-import { Chart, Grid, Line } from 'vue3-charts'
 import MainTable from '@/Components/Table/MainTable.vue';
 import ThTable from '@/Components/Table/ThTable.vue';
 import TdTable from '@/Components/Table/TdTable.vue';
-import { MetaInterface } from '@/types/MetaInterface';
-import { faCheck, faWarning, faCross } from '@fortawesome/free-solid-svg-icons';
+import { DashboardDataInterface } from '@/types/DashboardInterface';
 
-
-interface DashboardDataInterface{
-    data:{
-        vocabularies_number:number,
-        date:Date,
-        score:number
+const props=defineProps<{
+    dashboardCards : {
+        countAddedGrammar : number,
+        quizScoreRate : number,
+        examScoreRate : number
     },
-    meta:MetaInterface
+    vocabulariesData : DashboardDataInterface,
+    userNotice : {
+        lastTimeVocabulary : number,
+        lastTimeQuiz : number
+    }
+}>()
+
+const isConsistent : Ref<boolean> = ref(props.userNotice.lastTimeVocabulary==0 && props.userNotice.lastTimeQuiz==0)
+
+function  addedVocabularies() {
+    return props.vocabulariesData.data.reduce((acc, ele) => {
+        return acc + ele.vocabularies_number;
+  }, 0)
 }
 
-const props=defineProps({
-    vocabulariesData : Array<DashboardDataInterface>,
-    lastTimeVocabulary : Number,
-    lastTimeQuiz : Number
-})
-
-const isConsistent : Ref<boolean> = ref(props.lastTimeVocabulary==0 && props.lastTimeQuiz==0)
-
-
 const cardsItems : CardsType[]=[
-    {Label:'Quiz rate',subLabel:'0%','color':'blue',icon:faPercentage},
-    {Label:' Vocabularies',subLabel:'0','color':'red',icon:faNetworkWired},
-    {Label:'Quiz rate',subLabel:'0%','color':'red',icon:faPercentage},
-    {Label:' Vocabularies',subLabel:'0','color':'orange',icon:faNetworkWired}
+    {Label : 'Added Vocabularies', subLabel : addedVocabularies(), color : 'blue', icon : faFileContract},
+    {Label : 'Added Grammar', subLabel : props.dashboardCards.countAddedGrammar, color : 'red', icon : faSpellCheck},
+    {Label : 'Quiz Rate', subLabel : props.dashboardCards.quizScoreRate+'%', color : 'purple', icon : faClipboard},
+    {Label : 'Examen Rate', subLabel : props.dashboardCards.examScoreRate+'%', color : 'orange', icon : faPercentage}
 ]
 
 const dataDateType : Ref<DataDate> = ref(DataDate.ThisMonth)
-
-    const direction = ref('horizontal')
-    const margin = ref({
-      left: 0,
-      top: 20,
-      right: 20,
-      bottom: 0
-    })
-    const plByMonth = [
-  { name: 'Jan', pl: 1000, avg: 500, inc: 300 },
-  { name: 'Feb', pl: 2000, avg: 900, inc: 400 },
-  { name: 'Apr', pl: 400, avg: 400, inc: 500 },
-  { name: 'Mar', pl: 3100, avg: 1300, inc: 700 },
-  { name: 'May', pl: 200, avg: 100, inc: 200 },
-  { name: 'Jun', pl: 600, avg: 400, inc: 300 },
-  { name: 'Jul', pl: 500, avg: 90, inc: 100 }
-]
 </script>
 <template>
     <Head title="Dashboard" />
@@ -86,7 +69,7 @@ const dataDateType : Ref<DataDate> = ref(DataDate.ThisMonth)
 
             <!-- <h1 class="font-semibold mt-5 text-xl">Analytic For Vocabularies ({{ dataDateType }})</h1> -->
             <div class="grid grid-cols-4 py-2">
-                <div class="px-2 bg-white mr-4 rounded-l col-span-3">
+                <div class="mr-4 rounded-l col-span-3">
                     <MainTable :label="'Vocabularies Analytics ('+dataDateType +')'" :meta="vocabulariesData.meta">
                         <template #ThTable>
                             <ThTable>Date</ThTable>
@@ -97,26 +80,22 @@ const dataDateType : Ref<DataDate> = ref(DataDate.ThisMonth)
                             <tr v-for="item in vocabulariesData.data">
                                 <TdTable>{{ item.date }}</TdTable>
                                 <TdTable>{{ item.vocabularies_number }} Vocabularies</TdTable>
-                                <TdTable>{{ item.score }}%</TdTable>
+                                <TdTable>
+                                    <div :class="{
+                                            'bg-red-500' : item.score < 35,
+                                            'bg-orange-500' : item.score > 35 && item.score < 80,
+                                            'bg-green-500' : item.score > 80
+                                        }" class="p-1 text-white rounded-lg w-1/4 font-bold text-center">
+                                        {{ item.score }}%
+                                    </div>
+                                </TdTable>
                                 <TdTable></TdTable>
                             </tr>
                         </template>
                     </MainTable>
                 </div>
                 <div>
-                    <!-- <div class="p-6 bg-white rounded-l ">
-                        <div class="bg-red-600 bg-opacity-30 p-20 flex items-center justify-center">
-                            <faIcon :icon="faCheck" class="bg-white p-6 rounded-full text-2xl" />
-                            <ul class="ml-8 my-3 list-disc">
-                                <li>Last Time You uploaded a Vocabulary was {{ lastTimeVocabulary }} days</li>
-                                <li>Last Time You Practiced Vocabularies {{ lastTimeQuiz }} days</li>
-                                <li>You should keep consistent</li>
-                                <li>Practice the old words </li>
-                            </ul>
-                        </div>
-                    </div> -->
-
-                    <div class="rounded-lg bg-white py-14">
+                    <div class="rounded-lg bg-white py-14 mt-8">
                         <div class="flex justify-center">
                             <div :class="{'bg-green-200':isConsistent, 'bg-orange-200':!isConsistent}"
                                  class="rounded-full p-6">
@@ -125,16 +104,31 @@ const dataDateType : Ref<DataDate> = ref(DataDate.ThisMonth)
                                 </div>
                             </div>
                         </div>
-                        <div >
+                        <div>
                             <h3 class="my-4 text-center text-3xl font-semibold text-gray-700">
                                 {{ isConsistent ? 'Consistent' : 'Not Consistent' }}
                             </h3>
-                            <ul class="ml-8 my-3 list-disc mx-4 font-medium">
-                                <li v-if="lastTimeVocabulary>0">
-                                    Last Time You uploaded a Vocabulary was <span class="text-orange-500 font-semibold"> {{ lastTimeVocabulary }} day(s). </span>
+                            <ul class="my-3 mx-2 font-medium text-center">
+                                <li :class="{
+                                        'bg-orange-200' : userNotice.lastTimeVocabulary > 0,
+                                        'bg-green-200' : userNotice.lastTimeVocabulary == 0}"
+                                    class="p-2 rounded-xl mb-3">
+                                    Last Time You uploaded a Vocabulary was
+                                    <span :class="
+                                    {
+                                        'text-orange-600':userNotice.lastTimeVocabulary > 0,
+                                        'bg-green-600':userNotice.lastTimeVocabulary == 0
+                                    }" class="font-semibold"> {{ userNotice.lastTimeVocabulary }} day(s). </span>
                                 </li>
-                                <li v-if="lastTimeQuiz>0">
-                                    Last Time You Practiced Vocabularies <span class="text-orange-500 font-semibold">{{ lastTimeQuiz }} day(s). </span>
+                                <li :class="{
+                                            'bg-orange-200':userNotice.lastTimeQuiz > 0,
+                                            'bg-green-200':userNotice.lastTimeQuiz == 0}"
+                                    class="bg-orange-200 p-2 rounded-xl">
+                                    Last Time You Practiced Vocabularies <span :class="
+                                    {
+                                        'text-orange-600': userNotice.lastTimeQuiz > 0,
+                                        'bg-green-600': userNotice.lastTimeQuiz == 0
+                                    }" class="text-orange-500 font-semibold">{{ userNotice.lastTimeQuiz }} day(s). </span>
                                 </li>
                             </ul>
                         </div>
