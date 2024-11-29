@@ -41,12 +41,6 @@ class DashboardRepository{
                 ->withoutGlobalScope(QuizScope::class)
                 ->orderBy('vocabularies.date','desc')
                 ->paginate(7);
-        // dd([
-        //     'dashboardCards' => $this->dashboardCards($dateRange),
-        //     'vocabulariesData'=>DashboardResource::collection($vocabulariesData),
-        //     'userNotice' => $this->userNotice($dateRange),
-        //     'searchDate'=>$searchDate
-        // ]);
 
         return [
             'dashboardCards' => $this->dashboardCards($dateRange),

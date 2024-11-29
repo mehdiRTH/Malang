@@ -11,6 +11,7 @@ use App\Http\Resources\ThemeResource;
 use App\Models\Scopes\QuizScope;
 use App\Models\Theme;
 use App\Models\Vocabulary;
+use App\Services\AnalyzeVocabulariesService;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -117,40 +118,10 @@ class QuizRepository{
 
     public function checkVocabularies(Request $request): RedirectResponse
     {
-        $analyzedAnswers=$this->analyzeVocabularies($request->quiz_answers,$request->answers_lang);
+        $analyzedAnswers=(new AnalyzeVocabulariesService())->analyzedInputtedVocabularies($request->quiz_answers,$request->answers_lang);
 
         return $this->createQuiz($request,$analyzedAnswers['score'],$analyzedAnswers['wrongAnswers'],'Vocabulary');
 
-    }
-
-    public function analyzeVocabularies($answers,$lang='nl') : array
-    {
-        $count_quiz_answers=count($answers);
-        $count_wrong_answers=$count_quiz_answers;
-        $wrong_answers=[];
-
-        foreach($answers as $answer)
-        {
-            if(strtolower($answer[$lang])!=strtolower($answer['answer']))
-            {
-                array_push(
-                    $wrong_answers,
-                    [
-                        'answer'=>$answer['answer'],
-                        'right_answer'=>$answer[$lang],
-                        'translation_answer'=>$answer[$lang=='nl' ? 'en' : 'nl']
-                    ]);
-
-                --$count_wrong_answers;
-            }
-        }
-
-        $score=ceil(($count_wrong_answers/$count_quiz_answers)*100);
-
-        return [
-            'wrongAnswers'=>$wrong_answers,
-            'score'=>$score
-        ];
     }
 
     public function checkGrammar(Request $request) : RedirectResponse

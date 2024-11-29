@@ -1,4 +1,4 @@
-export enum DataDate{
+export enum DataDateType{
     LastMonth = 'Last Month',
     ThisMonth = 'This Month'
 }

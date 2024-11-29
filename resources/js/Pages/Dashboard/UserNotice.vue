@@ -1,17 +1,13 @@
 <script lang="ts" setup>
 import { Ref, ref } from 'vue';
 import { faCheck } from '@fortawesome/free-solid-svg-icons';
+import { DashboardDataNoticeInterface } from '@/types/Dashboard/DashboardDataNoticeInterface';
 
-interface userNoticeInterface{
-        lastTimeVocabulary : number | string,
-        lastTimeQuiz : number | string,
-        lastTimeExam : number | string
-    }
 const props=defineProps<{
-    userNotice:userNoticeInterface
+    userNotice:DashboardDataNoticeInterface
 }>()
 const isConsistent : Ref<boolean> = ref(props.userNotice.lastTimeVocabulary==0 && props.userNotice.lastTimeQuiz==0 && props.userNotice.lastTimeExam==0)
-const noticeLabel : Ref<userNoticeInterface> = ref({lastTimeVocabulary:'uploaded a Vocabulary',lastTimeQuiz:'Exercise a Quiz', lastTimeExam:'Passed an Exam'})
+const noticeLabel : Ref<DashboardDataNoticeInterface> = ref({lastTimeVocabulary:'uploaded a Vocabulary',lastTimeQuiz:'Exercise a Quiz', lastTimeExam:'Passed an Exam'})
 
 </script>
 <template>
@@ -26,9 +22,12 @@ const noticeLabel : Ref<userNoticeInterface> = ref({lastTimeVocabulary:'uploaded
                 </div>
             </div>
             <div>
+                <!-- Check If The user Consistent based on last time he practice a quiz and he has uploaded vocabularies and also passed exams -->
                 <h3 class="my-4 text-center text-3xl font-semibold text-gray-700">
                     {{ isConsistent ? 'Consistent' : 'Not Consistent' }}
                 </h3>
+
+                <!-- Message To the user counting last time he practice quiz, upload a vocabularies, passed an exam -->
                 <ul class="my-3 mx-2 font-medium text-center">
                     <li v-for="(item, key) in userNotice"
                     :class="{

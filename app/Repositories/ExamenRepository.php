@@ -6,6 +6,7 @@ namespace App\Repositories;
 use App\Http\Resources\ExamenQuizResource;
 use App\Http\Resources\ExamenResource;
 use App\Models\Exam;
+use App\Services\AnalyzeVocabulariesService;
 use Carbon\CarbonPeriod;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -110,7 +111,7 @@ class ExamenRepository{
         foreach($examAnswers as $key=>$quizPart)
         {
             //Calling the function that return the wrong answer and  the score of the quiz
-            $analyzedAnswers=(new QuizRepository())->analyzeVocabularies($quizPart);
+            $analyzedAnswers=(new AnalyzeVocabulariesService())->analyzedInputtedVocabularies($quizPart);
 
             //Check if it for showcase exam results or only the wrong answers to save them into exam infos
             if(!$storeExamData)
