@@ -7,39 +7,38 @@ import TdTable from '@/Components/Table/TdTable.vue';
 import ThTable from '@/Components/Table/ThTable.vue';
 import DisplayCards from '@/Components/DisplayCards.vue';
 import { CardsType } from '@/types/CardsType';
-import { faPercentage, faFileWord, faNetworkWired } from '@fortawesome/free-solid-svg-icons';
+import { faPercentage, faNetworkWired } from '@fortawesome/free-solid-svg-icons';
 import { QuizPerformanceInterface } from '@/types/QuizPerformance/QuizPerformanceInterface';
 import { ThemesInterface } from '@/types/Themes/ThemesInterface';
 
 
-
 const props=defineProps<{
-    quiz_vocabularies:QuizPerformanceInterface,
+    quizVocabularies:QuizPerformanceInterface,
     themes:ThemesInterface,
-    this_month_success_rate:number,
-    this_month_uploaded_vocabularies:number,
-    last_month_success_rate:number,
-    last_month_uploaded_vocabularies:number,
+    thisMonthScoreRate:number,
+    thisMonthUploadedVocabularies:number,
+    lastMonthScoreRate:number,
+    lastMonthUploadedVocabularies:number,
     type:string,
-    available_dates:Array
+    availableDates:Array<Date>
 }>()
 
 const toggleModal : Ref<boolean> = ref(false)
 const cardsItems : CardsType[]=[
-    {Label:props.last_month_success_rate+'% Quiz rate',subLabel:'last month','color':'blue',icon:faPercentage},
-    {Label:props.last_month_uploaded_vocabularies+' Vocabularies',subLabel:'last month','color':'red',icon:faNetworkWired},
-    {Label:props.this_month_success_rate+'% Quiz rate',subLabel:'This month','color':'red',icon:faPercentage},
-    {Label:props.this_month_uploaded_vocabularies+' Vocabularies',subLabel:'This month','color':'orange',icon:faNetworkWired}
+    {Label:props.lastMonthScoreRate+'% Quiz rate',subLabel:'last month','color':'blue',icon:faPercentage},
+    {Label:props.lastMonthUploadedVocabularies+' Vocabularies',subLabel:'last month','color':'red',icon:faNetworkWired},
+    {Label:props.thisMonthScoreRate+'% Quiz rate',subLabel:'This month','color':'red',icon:faPercentage},
+    {Label:props.thisMonthUploadedVocabularies+' Vocabularies',subLabel:'This month','color':'orange',icon:faNetworkWired}
 ]
 
 </script>
 <template>
   <AuthenticatedLayout label="Quiz Performance">
-        <CreateModal :show="toggleModal" :type="type" :dates="available_dates" :themes="themes" @close="toggleModal=false" />
+        <CreateModal :show="toggleModal" :type="type" :dates="availableDates" :themes="themes" @close="toggleModal=false" />
         <!-- Cards component -->
-        <DisplayCards :key="cardsItems" :items="cardsItems" />
+        <DisplayCards :key="cardsItems+''" :items="cardsItems" />
 
-        <MainTable label="Quiz Table" :meta="quiz_vocabularies.meta" @click_create="toggleModal=!toggleModal">
+        <MainTable label="Quiz Table" :meta="quizVocabularies.meta" @click_create="toggleModal=!toggleModal">
             <template #ThTable>
                 <ThTable>Answer language</ThTable>
                 <ThTable>Vocabularies number</ThTable>
@@ -48,7 +47,7 @@ const cardsItems : CardsType[]=[
                 <ThTable>Success Rate</ThTable>
             </template>
             <template #TdTable>
-                <tr v-for="quiz in quiz_vocabularies.data">
+                <tr v-for="quiz in quizVocabularies.data">
                     <TdTable>{{ quiz.answer_language }}</TdTable>
                     <TdTable>{{ quiz.vocabulary_number }} Vocabularies</TdTable>
                     <TdTable>{{ quiz.quiz_date }}</TdTable>

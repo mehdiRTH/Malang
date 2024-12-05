@@ -11,6 +11,7 @@ use App\Http\Resources\ThemeResource;
 use App\Models\Scopes\QuizScope;
 use App\Models\Theme;
 use App\Models\Vocabulary;
+use App\Services\Analytics;
 use App\Services\AnalyzeVocabulariesService;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
@@ -25,32 +26,48 @@ class QuizRepository{
     }
     public function indexQuizData($type='Vocabulary') : array
     {
-        $this_month_start_of_month=now()->startOfMonth()->format('Y-m-d');
-        $this_month_end_of_month=now()->endOfMonth()->format('Y-m-d');
-        $last_month_start_of_month=now()->startOfMonth()->subMonth()->format('Y-m-d');
-        $last_month_end_of_month=now()->endOfMonth()->subMonth()->format('Y-m-d');
-        $available_dates=null;
+        $currentMonthRange=[
+            now()->startOfMonth(),
+            now()->endOfMonth()
+        ];
 
-        if($type=='Grammar')
-        {
-            $available_dates=Vocabulary::whereHas('theme',function(Builder $builder){
-                $builder->where('name','Grammar');
-                })->selectRaw('DATE(created_at) as created_date')->distinct()->pluck('created_date');
-        }else{
-            $available_dates=$this->user->vocabularies()->whereHas('theme',function(Builder $builder){
-                $builder->where('name','!=','Grammar');
-                })->selectRaw('DATE(created_at) as created_date')->distinct()->pluck('created_date');
-        }
+        $lastMonthRange=[
+            now()->subMonth()->startOfMonth(),
+            now()->subMonth()->endOfMonth()
+        ];
+
+        $isVocabulary= $type == 'Vocabulary';
+        $grammarCondition= $isVocabulary ? '=' : '!=';
+        $analyticsService = new Analytics();
+
+        // Retrieve available dates based on type
+        $availableDatesQuery= $isVocabulary
+        ? $this->user->vocabularies()->whereHas('theme',fn(Builder $builder) => $builder->where('name','!=','Grammar'))
+        : Vocabulary::whereHas('theme',fn(Builder $builder) => $builder->where('name','Grammar'));
+
+        $availableDates = $availableDatesQuery
+        ->selectRaw('DATE(created_at) as created_date')
+        ->distinct()
+        ->pluck('created_date');
 
         return [
-            'quiz_vocabularies'=>QuizPerformanceResource::collection($this->user->quiz_performances()->orderBy('created_at','desc')->where('type',$type)->paginate(5)),
-            'themes'=>ThemeResource::collection(Theme::where('name','!=','Grammar')->orderBy('created_at','desc')->get()),
-            'this_month_success_rate'=>ceil($this->user->quiz_performances()->whereBetween('created_at',[$this_month_start_of_month, $this_month_end_of_month])->where('type',$type)->pluck('success_rate')->avg()),
-            'this_month_uploaded_vocabularies'=>$this->user->vocabularies()->withoutGlobalScope(QuizScope::class)->whereBetween('created_at',[$this_month_start_of_month, $this_month_end_of_month])->where('vocabulary_grammar',$type=='Vocabulary' ? '=' : '!=',null)->count(),
-            'last_month_success_rate'=>ceil($this->user->quiz_performances()->whereBetween('created_at',[$last_month_start_of_month, $last_month_end_of_month])->where('type',$type)->pluck('success_rate')->avg()),
-            'last_month_uploaded_vocabularies'=>$this->user->vocabularies()->withoutGlobalScope(QuizScope::class)->whereBetween('created_at',[$last_month_start_of_month, $last_month_end_of_month])->where('vocabulary_grammar',$type=='Vocabulary' ? '=' : '!=',null)->count(),
-            'type'=>$type,
-            'available_dates'=>$available_dates
+            'quizVocabularies' => QuizPerformanceResource::collection(
+                $this->user->quiz_performances()
+                    ->where('type', $type)
+                    ->orderByDesc('created_at')
+                    ->paginate(5)
+            ),
+            'themes' => ThemeResource::collection(
+                Theme::where('name', '!=', 'Grammar')
+                    ->orderByDesc('created_at')
+                    ->get()
+            ),
+            'thisMonthScoreRate' => $analyticsService->calculateScoreRate($this->user,$currentMonthRange, $type),
+            'thisMonthUploadedVocabularies' => $analyticsService->countUploadedVocabularies($this->user, $currentMonthRange, $grammarCondition),
+            'lastMonthScoreRate' => $analyticsService->calculateScoreRate($this->user, $lastMonthRange, $type),
+            'lastMonthUploadedVocabularies' => $analyticsService->countUploadedVocabularies($this->user, $lastMonthRange, $grammarCondition),
+            'type' => $type,
+            'availableDates' => $availableDates
         ];
     }
 
